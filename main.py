@@ -6,7 +6,7 @@ from pycoingecko import CoinGeckoAPI
 
 cg = CoinGeckoAPI()
 
-API_TOKEN = '5176920749:AAH1vevXt8M8v4OpcVIbwWmZApZKnO3m9us'
+API_TOKEN = ''
 
 logging.basicConfig(level=logging.INFO)
 
