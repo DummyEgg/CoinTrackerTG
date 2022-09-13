@@ -40,6 +40,11 @@ class Cache():
             else:
                 toSet.append([coin, cnt])
         self.setPrices(self, toSet)
+        for coin, cnt in toSet:
+            t = self.getPrice(self, coin)
+            if t:
+                msg.append([coin, cnt, t])
+            
 
     async def setPrices(self, toSet):
         ids = []
@@ -48,9 +53,10 @@ class Cache():
 
         t = await cg.get_price(ids=ids, vs_currencies='usd', include_24hr_change=True)
         for coin in t:
-            self.data[coin] = t[coin]
-            await(60)
-            self.data.pop(coin, None)
+            if (t[coin] != {}):
+                self.data[coin] = t[coin]
+                await(60)
+                self.data.pop(coin, None)
 
     
 
