@@ -9,7 +9,7 @@ cg = CoinGeckoAPI()
 
 cl = ListGenerator.generate()
 
-API_TOKEN = '853797580:AAERBp57OwmpnMGFzQ7NfuiNl7sH-7RT7f8'
+API_TOKEN = ''
 
 logging.basicConfig(level=logging.INFO)
 
