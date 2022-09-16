@@ -3,7 +3,7 @@ from pycoingecko import CoinGeckoAPI
 cg = CoinGeckoAPI()
 
 
-def generate():
+async def generate():
     list = cg.get_coins_list()
     d = {}
     for obj in list:
