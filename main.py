@@ -4,19 +4,34 @@ from aiogram.dispatcher.handler import SkipHandler
 from aiogram.types import ChatType
 from pycoingecko import CoinGeckoAPI
 import ListGenerator
-from time import sleep
+import asyncio, datetime
+from dotenv import load_dotenv, dotenv_values
+
+
+load_dotenv()
+config = dotenv_values('.env')
+
 cg = CoinGeckoAPI()
 
-cl = ListGenerator.generate()
+cl = {}
 
-API_TOKEN = ''
+UPDATE_TIME = 3600*24
+
+async def updateCoinList():
+    while True:
+        global cl
+        cl = await ListGenerator.generate()
+        await asyncio.sleep(UPDATE_TIME)
+
+
+
+API_TOKEN = config['API_TOKEN']
 
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=API_TOKEN)
 
 dp = Dispatcher(bot)
-
 
 class Cache():
     def __init__(self, data = {}):
@@ -53,10 +68,8 @@ class Cache():
         t = cg.get_price(ids=ids, vs_currencies='usd', include_24hr_change=True)
         for coin in t:
             if (t[coin] != {}):
-                self.data[coin] = t[coin]
-                print(self.data['bitcoin'])
-                await sleep(60)
-                self.data.pop(coin, None)
+                now = datetime.now()
+                self.data[coin] = [t[coin], now]
                  
 
     
@@ -91,5 +104,15 @@ async def send_welcome(message: types.Message):
 
 
 
+async def main():
+    
+    tasks = [
+        asyncio.create_task(updateCoinList()),
+        asyncio.create_task(executor.start_polling(dp, skip_updates=True))
+    ]
+    
+    await asyncio.gather(*tasks)
+
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(main())
+    
