@@ -1,3 +1,4 @@
+from ast import parse
 import logging
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.handler import SkipHandler
@@ -39,7 +40,14 @@ class Cache():
 
     async def getPrice(self, coin):
         if (coin in self.data):
-            return self.data[coin]
+            lastChecked = self.data[coin][1]
+            now = datetime.datetime.now()
+            delta = now-lastChecked
+            deltaS = delta.total_seconds()
+            logging.debug(f"difference {deltaS}")
+            if (deltaS >= 60):
+                return None
+            return self.data[coin][0]
         else:
             return None
     
@@ -55,7 +63,6 @@ class Cache():
         await self.setPrices(toSet)
         for coin, cnt in toSet:
             t = await self.getPrice(coin)
-            print(self.data['bitcoin'])
             if t:
                 msg.append([coin, cnt, t])
         return msg
@@ -68,7 +75,7 @@ class Cache():
         t = cg.get_price(ids=ids, vs_currencies='usd', include_24hr_change=True)
         for coin in t:
             if (t[coin] != {}):
-                now = datetime.now()
+                now = datetime.datetime.now()
                 self.data[coin] = [t[coin], now]
                  
 
@@ -84,8 +91,6 @@ async def parseAndRequest(message):
         if (nw.isnumeric()):
             cnt = int(nw)
             coin = m[i+1]
-            if (coin == 'btc'):
-                print(cl[coin])
             if (coin in cl and cl[coin] != coin):
                 q.append([cl[coin], cnt])
             q.append([coin, cnt])
@@ -93,13 +98,26 @@ async def parseAndRequest(message):
     return await cache.getPrices(q)
 
 
+def beautifulResponse(coins):
+    msg = f""""""
+    for coin,cnt,t in coins:
+        change = t['usd_24h_change']
+        change = "{:.2f}".format(change)
+        if (change[0] != '-'):
+            change = "+" + change
+        msg += f"``` {cnt} {coin}:```"
+        msg += f"``` {t['usd']*cnt} usd\t\t | {change}% ```"
+        msg += "\n"
+    return msg
+
+#([{coin}](https://coingecko.com/en/coins/{coin}))
 
 @dp.message_handler(chat_type=[ChatType.PRIVATE, ChatType.SUPERGROUP, ChatType.all])
 async def send_welcome(message: types.Message):
     #await message.reply("Hi\n your message was " + message.text)
     response = await parseAndRequest(message.text)
     if response != []:
-        await message.reply(response)
+        await message.reply(beautifulResponse(response), parse_mode='MARKDOWN')
     raise SkipHandler
 
 
@@ -108,7 +126,7 @@ async def main():
     
     tasks = [
         asyncio.create_task(updateCoinList()),
-        asyncio.create_task(executor.start_polling(dp, skip_updates=True))
+        dp.start_polling()
     ]
     
     await asyncio.gather(*tasks)
