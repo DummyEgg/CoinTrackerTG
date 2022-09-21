@@ -7,7 +7,7 @@ from pycoingecko import CoinGeckoAPI
 import ListGenerator
 import asyncio, datetime
 from dotenv import load_dotenv, dotenv_values
-
+import re
 
 load_dotenv()
 config = dotenv_values('.env')
@@ -23,7 +23,6 @@ async def updateCoinList():
         global cl
         cl = await ListGenerator.generate()
         await asyncio.sleep(UPDATE_TIME)
-
 
 
 API_TOKEN = config['API_TOKEN']
@@ -69,9 +68,11 @@ class Cache():
             
 
     async def setPrices(self, toSet):
-        ids = []
+        ids = [id for id, _ in toSet]
+        """
         for id, _ in toSet:
             ids.append(id)
+        """
         t = cg.get_price(ids=ids, vs_currencies='usd', include_24hr_change=True)
         for coin in t:
             if (t[coin] != {}):
@@ -82,19 +83,20 @@ class Cache():
     
 cache = Cache()
 
-
 async def parseAndRequest(message):
-    m = message.split()
+    r = re.findall('[0-9.]+\s[a-zA-Z0-9]{1,}', message)
+    if r is None:
+        return []
     q = []
-    for i in range(0, len(m)-1):
-        nw = m[i]
-        if (nw.isnumeric()):
-            cnt = int(nw)
-            coin = m[i+1]
-            if (coin in cl and cl[coin] != coin):
-                q.append([cl[coin], cnt])
-            q.append([coin, cnt])
-    
+    for st in r:
+        print(st)
+        s = st.split()[::-1]
+        print(s)
+        coin = s[0]
+        cnt = s[1]
+        q.append([coin, cnt])
+        if coin in cl and cl[coin] != coin:
+            q.append([cl[coin], cnt])
     return await cache.getPrices(q)
 
 
@@ -106,7 +108,7 @@ def beautifulResponse(coins):
         if (change[0] != '-'):
             change = "+" + change
         msg += f"``` {cnt} {coin}:```"
-        msg += f"``` {t['usd']*cnt} usd\t\t | {change}% ```"
+        msg += f"``` {t['usd']*float(cnt)} usd\t\t | {change}% ```"
         msg += "\n"
     return msg
 
