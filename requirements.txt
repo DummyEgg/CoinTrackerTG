@@ -1,0 +1,7 @@
+aiogram
+pycoingecko
+dotenv
+re
+logging
+asyncio
+datetime
