@@ -68,10 +68,6 @@ class Cache():
 
     async def setPrices(self, toSet):
         ids = [id for id, _ in toSet]
-        """
-        for id, _ in toSet:
-            ids.append(id)
-        """
         t = cg.get_price(ids=ids, vs_currencies='usd', include_24hr_change=True)
         for coin in t:
             if (t[coin] != {}):
@@ -88,9 +84,7 @@ async def parseAndRequest(message):
         return []
     q = []
     for st in r:
-        print(st)
         s = st.split()[::-1]
-        print(s)
         coin = s[0]
         cnt = s[1]
         q.append([coin, cnt])
