@@ -1,6 +1,6 @@
 aiogram
 pycoingecko
-dotenv
+python-dotenv
 re
 logging
 asyncio
