@@ -85,7 +85,7 @@ async def parseAndRequest(message):
     q = []
     for st in r:
         s = st.split()[::-1]
-        coin = s[0]
+        coin = s[0].lower()
         cnt = s[1]
         q.append([coin, cnt])
         if coin in cl and cl[coin] != coin:
