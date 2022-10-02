@@ -114,12 +114,12 @@ async def sendWelcome(message: types.Message):
         await message.reply(beautifulResponse(response), parse_mode='MARKDOWN')
     raise SkipHandler
 
-
+""" TODO currencies
 @dp.message_handler(commands='currencies')
 async def sendCurrencies(message: types.Message):
     #msg = currency.getCurrencies(message.chat.id)
     await message.reply("Current currencies for your chat are:" + msg)
-
+"""
 
 async def main():
     
