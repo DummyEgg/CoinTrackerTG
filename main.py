@@ -100,8 +100,7 @@ def beautifulResponse(coins):
         change = "{:.2f}".format(change)
         if (change[0] != '-'):
             change = "+" + change
-        msg += f"``` {cnt} {coin}:```"
-        msg += f"``` {t['usd']*float(cnt)} usd\t\t | {change}% ```"
+        msg += f"``` {cnt} {coin}:  \n {t['usd']*float(cnt)} usd\t\t | {change}% ```"
         msg += "\n"
     return msg
 
