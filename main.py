@@ -7,7 +7,7 @@ import ListGenerator
 import asyncio, datetime
 from dotenv import load_dotenv, dotenv_values
 import re
-
+from currency import Currency
 load_dotenv()
 config = dotenv_values('.env')
 
@@ -107,13 +107,18 @@ def beautifulResponse(coins):
 #([{coin}](https://coingecko.com/en/coins/{coin}))
 
 @dp.message_handler(chat_type=[ChatType.PRIVATE, ChatType.SUPERGROUP, ChatType.all])
-async def send_welcome(message: types.Message):
+async def sendWelcome(message: types.Message):
     #await message.reply("Hi\n your message was " + message.text)
     response = await parseAndRequest(message.text)
     if response != []:
         await message.reply(beautifulResponse(response), parse_mode='MARKDOWN')
     raise SkipHandler
 
+
+@dp.message_handler(commands='currencies')
+async def sendCurrencies(message: types.Message):
+    msg = currency.getCurrencies(message.chat.id)
+    await message.reply("Current currencies for your chat are:" + msg)
 
 
 async def main():
