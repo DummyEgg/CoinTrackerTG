@@ -117,7 +117,7 @@ async def sendWelcome(message: types.Message):
 
 @dp.message_handler(commands='currencies')
 async def sendCurrencies(message: types.Message):
-    msg = currency.getCurrencies(message.chat.id)
+    #msg = currency.getCurrencies(message.chat.id)
     await message.reply("Current currencies for your chat are:" + msg)
 
 
