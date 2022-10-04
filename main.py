@@ -89,7 +89,9 @@ async def parseAndRequest(message):
         cnt = s[1]
         q.append([coin, cnt])
         if coin in cl and cl[coin] != coin:
-            q.append([cl[coin], cnt])
+            for i in cl[coin]:
+                print(cl[coin])
+                q.append([i, cnt])
     return await cache.getPrices(q)
 
 
